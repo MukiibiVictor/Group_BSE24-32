@@ -14,7 +14,7 @@ The main objective of this project is to enable developers and DevOps teams to u
 
 ## Installation
 Follow these steps to set up the project locally:
-1. Clone the repository: `git clone https://github.com/username/repository-name.git`
+1. Clone the repository: `git clone https://github.com/MukiibiVictor/Group_BSE24-32.git`
 2. Navigate to the project directory: `cd repository-name`
 3. Create a virtual environment:For Windows(cmd) => `env\Scripts\activate`, For Windows(cmd) => `source env/bin/activate`
 4. Install dependencies : `pip install -r requirements.txt`
