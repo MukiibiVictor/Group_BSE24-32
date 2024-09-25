@@ -19,7 +19,12 @@ Follow these steps to set up the project locally:
 3. Create a virtual environment:For Windows(cmd) => `env\Scripts\activate`, For Windows(cmd) => `source env/bin/activate`
 4. Install dependencies : `pip install -r requirements.txt`
 5. Run migrations: `python manage.py migrate`
-6. Start Django Development Server: `python manage.py runserver` 
+6. Start Django Development Server: `python manage.py runserver`
+
+## Project Setup
+- Initialize a Git repository: `git init`
+- Set up remote on GitHub: `git remote add origin https://github.com/yourusername/Group_BSE24-X.git`
+
 
 ## Features of the web application
 - User authentication (Sign up, login)
