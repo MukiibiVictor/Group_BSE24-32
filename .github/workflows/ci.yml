@@ -1,35 +1,56 @@
 name: CI Pipeline
 
-# Trigger this workflow on pushes to the 'main' branch or on pull requests
+# Trigger this workflow on pushes to the 'winfredB' branch or on pull requests
 on:
   push:
     branches:
-      - main
+      - winfredB
   pull_request:
     branches:
-      - main
+      - winfredB
 
-# The jobs section defines what actions will be taken
 jobs:
   build:
-    # The environment the job will run on
-    runs-on: windows-latest  # Changed from ubuntu-latest to windows-latest for Windows environment
+    runs-on: ubuntu-latest
 
     steps:
-    # Checkout the code in your repository
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Set up Node.js environment (example for Node.js)
+    # Set up Python environment for Django
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    # Install backend dependencies
+    - name: Install backend dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Run database migrations
+    - name: Run migrations
+      run: python manage.py migrate
+
+    # Run Django tests
+    - name: Run Django tests
+      run: python manage.py test
+
+    # Set up Node.js for frontend
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '14'
+        node-version: '14'  # Specify your Node.js version
 
-    # Install dependencies (example for Node.js)
-    - name: Install dependencies
-      run: npm install
+    # Install frontend dependencies
+    - name: Install frontend dependencies
+      run: |
+        cd frontend  # Navigate to your frontend directory if applicable
+        npm install
 
-    # Run build or test
-    - name: Run tests
-      run: npm test
+    # Run frontend tests (adjust if you have a specific test command)
+    - name: Run frontend tests
+      run: |
+        cd frontend  # Navigate to your frontend directory
+        npm test
