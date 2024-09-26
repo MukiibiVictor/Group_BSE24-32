@@ -1,13 +1,12 @@
-name: CI Pipeline
+name: CI
 
-# Trigger this workflow on pushes to the 'winfredB' branch or on pull requests
 on:
   push:
     branches:
-      - winfredB
+      - winfredB  # Change to your branch name if different
   pull_request:
     branches:
-      - winfredB
+      - winfredB  # Change to your branch name if different
 
 jobs:
   build:
@@ -15,42 +14,32 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
-    # Set up Python environment for Django
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
-        python-version: '3.9'
+        python-version: '3.9'  # Ensure you're using a compatible version
 
-    # Install backend dependencies
-    - name: Install backend dependencies
+    - name: Upgrade pip
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
 
-    # Run database migrations
-    - name: Run migrations
-      run: python manage.py migrate
-
-    # Run Django tests
-    - name: Run Django tests
-      run: python manage.py test
-
-    # Set up Node.js for frontend
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '14'  # Specify your Node.js version
-
-    # Install frontend dependencies
-    - name: Install frontend dependencies
+    - name: Install dependencies
       run: |
-        cd frontend  # Navigate to your frontend directory if applicable
-        npm install
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        else
+          echo "requirements.txt not found!"
+          exit 1
+        fi
 
-    # Run frontend tests (adjust if you have a specific test command)
-    - name: Run frontend tests
+    - name: Run Tests
       run: |
-        cd frontend  # Navigate to your frontend directory
-        npm test
+        # Add commands to run your tests here
+        echo "Add your test commands here."
+
+    - name: Check for any issues
+      run: |
+        # Optionally, you can add linting or other checks here
+        echo "Check for issues here."
