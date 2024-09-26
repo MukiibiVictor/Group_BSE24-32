@@ -16,7 +16,7 @@ The main objective of this project is to enable developers and DevOps teams to u
 Follow these steps to set up the project locally:
 1. Clone the repository: `git clone https://github.com/MukiibiVictor/Group_BSE24-32.git`
 2. Navigate to the project directory: `cd repository-name`
-3. Create a virtual environment:For Windows(cmd) => `env\Scripts\activate`, For Windows(cmd) => `source env/bin/activate`
+3. Create and activate a virtual environment:For Windows(cmd) =>(CREATE)=> `python -m venv env` =>(ACTIVATE)=> `env\Scripts\activate`, For Windows(cmd) => `source env/bin/activate`
 4. Install dependencies : `pip install -r requirements.txt`
 5. Run migrations: `python manage.py migrate`
 6. Start Django Development Server: `python manage.py runserver`
