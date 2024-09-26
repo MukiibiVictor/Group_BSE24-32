@@ -36,7 +36,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run Tests
-      run: pytest cakestore/tests.py
+      run: pytest /Cake Addicts/cakestore/tests.py
         
 
     - name: Upload Coverage to Codecov
