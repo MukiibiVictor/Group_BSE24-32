@@ -1,0 +1,35 @@
+name: CI Pipeline
+
+# Trigger this workflow on pushes to the 'main' branch or on pull requests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# The jobs section defines what actions will be taken
+jobs:
+  build:
+    # The environment the job will run on
+    runs-on: windows-latest  # Changed from ubuntu-latest to windows-latest for Windows environment
+
+    steps:
+    # Checkout the code in your repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Set up Node.js environment (example for Node.js)
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    # Install dependencies (example for Node.js)
+    - name: Install dependencies
+      run: npm install
+
+    # Run build or test
+    - name: Run tests
+      run: npm test
