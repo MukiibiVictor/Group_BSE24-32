@@ -3,5 +3,3 @@
 Django==4.2.12
 pillow
 stripe
-pytest>=8.0
-pytest-django>=4.0
