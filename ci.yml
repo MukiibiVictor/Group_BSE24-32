@@ -1,0 +1,66 @@
+name: CI for Automated Testing and Code Quality
+
+on:
+  push:
+    branches:
+      - winfredB  # Specify the branch to trigger on
+  pull_request:
+    branches:
+      - winfredB  # Specify the branch for pull requests
+
+jobs:
+  test_and_quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'  # Specify your Python version
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Ensure requirements.txt is in the root
+
+      - name: Run database migrations
+        run: |
+          python manage.py migrate
+
+      - name: Run Django tests
+        run: |
+          python manage.py test  # Run Django tests using the test framework
+
+      - name: Run code quality checks (Python)
+        run: |
+          pip install flake8  # Install flake8 for Python
+          flake8 .  # Run flake8 to check Python code quality
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Specify the Node.js version
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend  # Change to your frontend directory if needed
+          npm install  # Install frontend dependencies
+
+      - name: Run frontend tests
+        run: |
+          cd frontend  # Change to your frontend directory if needed
+          npm test  # Adjust based on your testing framework for frontend
+
+      - name: Run code quality checks (JavaScript)
+        run: |
+          cd frontend  # Change to your frontend directory if needed
+          npm install eslint --save-dev  # Install ESLint for JavaScript
+          npx eslint .  # Run ESLint to check JavaScript code quality
+
+      - name: Build frontend assets
+        run: |
+          cd frontend  # Change to your frontend directory if needed
+          npm run build  # Build the frontend assets (Webpack)
