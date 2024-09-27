@@ -1,84 +1,117 @@
-from django.test import TestCase
+from django.test import TestCase, Client
+from django.urls import reverse
 from django.contrib.auth.models import User
-from .models import Category, Item, Cart, cartItem, Order, orderItem
+from .models import Item, Category, Cart
+from django.db.models import Sum
+from django.test import TestCase
+from .models import Item, Cart, Category
 
-class CategoryModelTests(TestCase):
-    
-    def test_string_representation(self):
-        category = Category(name="Electronics")
-        self.assertEqual(str(category), category.name)
+class ViewsTestCase(TestCase):
 
-
-class ItemModelTests(TestCase):
-    
     def setUp(self):
-        self.category = Category.objects.create(name="Electronics")
+        self.client = Client()
+        # Setting up test data
+        self.category = Category.objects.create(name="Cakes")
         self.item = Item.objects.create(
-            category=self.category,
-            name="Laptop",
-            price=999.99,
-            description="A high-performance laptop."
+            category=self.category, 
+            name="Chocolate Cake", 
+            price=20.00
         )
-
-    def test_string_representation(self):
-        self.assertEqual(str(self.item), self.item.name)
-
-    def test_item_creation(self):
-        self.assertEqual(self.item.category, self.category)
-        self.assertEqual(self.item.price, 999.99)
-        self.assertEqual(self.item.description, "A high-performance laptop.")
-
-
-class CartModelTests(TestCase):
-
-    def setUp(self):
-        self.category = Category.objects.create(name="Electronics")
-        self.item = Item.objects.create(category=self.category, name="Laptop", price=999.99)
         self.cart = Cart.objects.create(item=self.item, quantity=2)
+        self.user = User.objects.create_user(username='testuser', password='testpass')
 
-    def test_string_representation(self):
-        self.assertEqual(str(self.cart), self.cart.item.name)
+    def test_showHome(self):
+        response = self.client.get(reverse('home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'cakestore/index.html')
+        self.assertIn('items', response.context)
+        self.assertIn('cart', response.context)
 
-    def test_total_ordering(self):
-        self.assertEqual(self.cart.total_odering, 1999.98)
+    def test_addCart(self):
+        response = self.client.post(reverse('add_cart', args=[self.item.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Cart.objects.filter(item=self.item).count(), 1)
 
-
-class CartItemModelTests(TestCase):
+    def test_checkout_without_login(self):
+        response = self.client.get(reverse('checkout'))
+        self.assertRedirects(response, '/login/?next=/checkout/')
     
+    def test_checkout_with_login(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(reverse('checkout'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'cakestore/payments.html')
+
+    def test_login_user(self):
+        response = self.client.post(reverse('login'), {
+            'username': 'testuser',
+            'password': 'testpass'
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('home'))
+
+    def test_logout_user(self):
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(reverse('logout'))
+        self.assertRedirects(response, reverse('home'))
+
+
+class IntegrationTestCase(TestCase):
     def setUp(self):
-        self.category = Category.objects.create(name="Electronics")
-        self.item = Item.objects.create(category=self.category, name="Laptop", price=999.99)
+        self.client = Client()
+        self.category = Category.objects.create(name="Drinks")
+        self.item = Item.objects.create(
+            category=self.category, 
+            name="Lemonade", 
+            price=5.00
+        )
+        self.user = User.objects.create_user(username='user1', password='password1')
+
+    def test_add_cart_and_checkout_flow(self):
+        # Step 1: Add item to cart
+        self.client.post(reverse('add_cart', args=[self.item.id]))
+        cart = Cart.objects.filter(item=self.item).first()
+        self.assertIsNotNone(cart)
+        self.assertEqual(cart.quantity, 1)
+
+        # Step 2: Login and checkout
+        self.client.login(username='user1', password='password1')
+        response = self.client.get(reverse('checkout'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('key', response.context)
+        self.assertIn('total', response.context)
+
+
+
+class ModelsTestCase(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(name="Cakes")
+        self.item = Item.objects.create(
+            category=self.category, 
+            name="Red Velvet Cake", 
+            price=15.00
+        )
+        self.cart = Cart.objects.create(item=self.item, quantity=3)
+
+    def test_item_string_representation(self):
+        self.assertEqual(str(self.item), "Red Velvet Cake")
+
+    def test_cart_total_ordering(self):
+        self.assertEqual(self.cart.total_odering(), 45.00)  # 3 * 15 = 45
+
+
+class ModelsIntegrationTestCase(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(name="Beverages")
+        self.item = Item.objects.create(
+            category=self.category, 
+            name="Tea", 
+            price=3.00
+        )
         self.cart = Cart.objects.create(item=self.item, quantity=2)
-        self.cart_item = cartItem.objects.create(cart=self.cart, item=self.item, quantity=3)
 
-    def test_string_representation(self):
-        self.assertEqual(str(self.cart_item), self.cart_item.item.name)
+    def test_cart_and_item_interaction(self):
+        self.assertEqual(self.cart.total_odering(), 6.00)
+        self.assertEqual(self.item.category.name, "Beverages")
 
-
-class OrderModelTests(TestCase):
-
-    def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.category = Category.objects.create(name="Electronics")
-        self.item = Item.objects.create(category=self.category, name="Laptop", price=999.99)
-        self.order = Order.objects.create(User=self.user, item=self.item, quantity=1)
-
-    def test_string_representation(self):
-        self.assertEqual(str(self.order), str(self.order.item))
-
-    def test_total_ordering(self):
-        self.assertEqual(self.order.total_odering, 999.99)
-
-
-class OrderItemModelTests(TestCase):
-
-    def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.category = Category.objects.create(name="Electronics")
-        self.item = Item.objects.create(category=self.category, name="Laptop", price=999.99)
-        self.order = Order.objects.create(User=self.user, item=self.item, quantity=1)
-        self.order_item = orderItem.objects.create(order=self.order, item=self.item, quantity=2)
-
-    def test_string_representation(self):
-        self.assertEqual(str(self.order_item), self.order_item.item.name)
-
+    
