@@ -3,10 +3,12 @@ name: CI
 on:
   push:
     branches:
-      - winfredB  # Change this to your branch name if needed
+      - winfredB
+      - mukiibi_change
   pull_request:
     branches:
-      - main      # Change this to your base branch if needed
+      - main
+      - mukiibi_change
 
 jobs:
   build:
@@ -16,10 +18,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.11
       uses: actions/setup-python@v2
       with:
-        python-version: '3.10'  # Change to the desired version
+        python-version: '3.11'  # Update to your installed version
 
     - name: Install dependencies
       run: |
@@ -28,4 +30,4 @@ jobs:
 
     - name: Run tests
       run: |
-        # Your test commands here
+        python -m unittest discover  # Example command for running tests
