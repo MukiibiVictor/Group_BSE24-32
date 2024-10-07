@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pytest_django'
+    'pytest_django',
+    'cakestore'
+    
 ]
 
 MIDDLEWARE = [
