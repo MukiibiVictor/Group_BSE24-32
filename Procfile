@@ -1,1 +1,1 @@
-web: gunicorn cakeaddicts.wsgi 
+web: gunicorn cakeaddicts.wsgi
