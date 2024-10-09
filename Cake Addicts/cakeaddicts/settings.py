@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url # type: ignore
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-b0%zs_fyk!@-d03w782n+dt5y)*k!bfb!=s7g36m)823yzq%(+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ 'cakestore.herokuapp.com']
 
 
 # Application definition
@@ -50,6 +51,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'cakeaddicts.urls'
@@ -78,10 +81,9 @@ WSGI_APPLICATION = 'cakeaddicts.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+   'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+
+    
 }
 
 
@@ -103,16 +105,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-MEDIA_URL = 'uploadMedia/'
-# MEDIA_ROOT =  os.path.join(BASE_DIR, '/media/images') 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/images')
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'  # Start with a leading slash
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Collect static files here
+STATICFILES_DIRS = [BASE_DIR / "static", BASE_DIR / "cakestore"]  # Include both directories
 
-STATICFILES_DIRS = ( 
-    'cakestore',
-    # os.path.join(BASE_DIR, 'static'),
-    )
+# WhiteNoise storage
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Media files (uploads)
+MEDIA_URL = '/uploadMedia/'  # Start with a leading slash
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/images')  # Directory for uploaded media
+
 
 
 # Internationalization
@@ -145,7 +149,7 @@ STRIPE_PUBLISHABLE_KEY = 'pk_test_51LmstwIcrvW4NoX9WGPDv6PZ52lt8oc3vq9e5ynZ3bg2E
 
 
 #STMP CONFIG
-from django.core.mail import send_mail
+from django.core.mail import send_mail # type: ignore
 EMAIL_BACKEND= 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST= 'smtp.gmail.com'
 EMAIL_PORT = 587
