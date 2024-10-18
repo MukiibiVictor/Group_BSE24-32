@@ -9,8 +9,8 @@ getYear();
 
 
 // isotope js
-$(window).on('load', function () {
-    $('.filters_menu li').click(function () {
+$(window).on('load', function() {
+    $('.filters_menu li').click(function() {
         $('.filters_menu li').removeClass('active');
         $(this).addClass('active');
 
@@ -32,7 +32,7 @@ $(window).on('load', function () {
 // nice select
 $(document).ready(function() {
     $('select').niceSelect();
-  });
+});
 
 /** google_map js **/
 function myMap() {

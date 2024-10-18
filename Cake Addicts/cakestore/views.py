@@ -189,7 +189,7 @@ def charge(request):
 	total = Cart.objects.all().aggregate(Sum('total_ordering'))
 	post_tot = total['total_ordering__sum']
 	if request.method == 'POST':
-		charge = stripe.charge.Create(
+		charge = stripe.Charge.create(
             amount= post_tot,
             currency='ugx',
             description ='Check Out Charge',
